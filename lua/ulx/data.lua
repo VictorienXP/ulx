@@ -172,12 +172,15 @@ ulx voteEcho 0 ; 1 = Echo what every player votes (this does not apply to votema
 
 ulx votemap2Successratio 0.5 ; Ratio of (votes for map)/(total players) needed to change map. (Rounds up)
 ulx votemap2Minvotes 3 ; Number of minimum votes needed to change map (Pevents llamas). This supercedes the above convar on small servers.
+ulx votemap2Confirmation 1 ; Confirm mapchange.
 
 ulx votekickSuccessratio 0.6 ; Ratio of (votes for kick)/(total players) needed to kick player. (Rounds up)
 ulx votekickMinvotes 2 ; Number of minimum votes needed to kick player (Pevents llamas). This supercedes the above convar on small servers.
+ulx votekickConfirmation 1 ; Confirm votekick.
 
 ulx votebanSuccessratio 0.7 ; Ratio of (votes for ban)/(total players) needed to ban player. (Rounds up)
 ulx votebanMinvotes 3 ; Number of minimum votes needed to ban player (Pevents llamas). This supercedes the above convar on small servers.
+ulx votebanConfirmation 1 ; Confirm voteban.
 ]]
 
 files["downloads.txt"] =

@@ -179,6 +179,7 @@ local function voteMapDone( t, argv, ply )
 
 	local ratioNeeded = GetConVarNumber( "ulx_votemap2Successratio" )
 	local minVotes = GetConVarNumber( "ulx_votemap2Minvotes" )
+	local confirm = GetConVar( "ulx_votemap2Confirmation" ):GetBool()
 	local str
 	local changeTo
 	-- Figure out the map to change to, if we're changing
@@ -190,7 +191,7 @@ local function voteMapDone( t, argv, ply )
 
 	if (#argv < 2 and winner ~= 1) or not winner or winnernum < minVotes or winnernum / t.votes < ratioNeeded then
 		str = "Vote results: Vote was unsuccessful."
-	elseif ply:IsValid() then
+	elseif ply:IsValid() and confirm then
 		str = "Vote results: Option '" .. t.options[ winner ] .. "' won, changemap pending approval. (" .. winnernum .. "/" .. t.votes .. ")"
 
 		ulx.doVote( "Accept result and changemap to " .. changeTo .. "?", { "Yes", "No" }, voteMapDone2, 30000, { ply }, true, changeTo, ply )
@@ -236,6 +237,7 @@ votemap2:defaultAccess( ULib.ACCESS_ADMIN )
 votemap2:help( "Starts a public map vote." )
 if SERVER then ulx.convar( "votemap2Successratio", "0.5", _, ULib.ACCESS_ADMIN ) end -- The ratio needed for a votemap2 to succeed
 if SERVER then ulx.convar( "votemap2Minvotes", "3", _, ULib.ACCESS_ADMIN ) end -- Minimum votes needed for votemap2
+if SERVER then ulx.convar( "votemap2Confirmation", "1", _, ULib.ACCESS_ADMIN ) end
 
 
 
@@ -271,13 +273,14 @@ local function voteKickDone( t, target, time, ply, reason )
 
 	local ratioNeeded = GetConVarNumber( "ulx_votekickSuccessratio" )
 	local minVotes = GetConVarNumber( "ulx_votekickMinvotes" )
+	local confirm = GetConVar( "ulx_votekickConfirmation" ):GetBool()
 	local str
 	if winner ~= 1 or winnernum < minVotes or winnernum / t.votes < ratioNeeded then
 		str = "Vote results: User will not be kicked. (" .. (results[ 1 ] or "0") .. "/" .. t.votes .. ")"
 	else
 		if not target:IsValid() then
 			str = "Vote results: User voted to be kicked, but has already left."
-		elseif ply:IsValid() then
+		elseif ply:IsValid() and confirm then
 			str = "Vote results: User will now be kicked, pending approval. (" .. winnernum .. "/" .. t.votes .. ")"
 			ulx.doVote( "Accept result and kick " .. target:Nick() .. "?", { "Yes", "No" }, voteKickDone2, 30000, { ply }, true, target, time, ply, reason )
 		else -- Vote from server console, roll with it
@@ -321,6 +324,7 @@ votekick:defaultAccess( ULib.ACCESS_ADMIN )
 votekick:help( "Starts a public kick vote against target." )
 if SERVER then ulx.convar( "votekickSuccessratio", "0.6", _, ULib.ACCESS_ADMIN ) end -- The ratio needed for a votekick to succeed
 if SERVER then ulx.convar( "votekickMinvotes", "2", _, ULib.ACCESS_ADMIN ) end -- Minimum votes needed for votekick
+if SERVER then ulx.convar( "votekickConfirmation", "1", _, ULib.ACCESS_ADMIN ) end
 
 
 
@@ -352,12 +356,13 @@ local function voteBanDone( t, nick, steamid, time, ply, reason )
 
 	local ratioNeeded = GetConVarNumber( "ulx_votebanSuccessratio" )
 	local minVotes = GetConVarNumber( "ulx_votebanMinvotes" )
+	local confirm = GetConVar( "ulx_votebanConfirmation" ):GetBool()
 	local str
 	if winner ~= 1 or winnernum < minVotes or winnernum / t.votes < ratioNeeded then
 		str = "Vote results: User will not be banned. (" .. (results[ 1 ] or "0") .. "/" .. t.votes .. ")"
 	else
 		reason = ("[ULX Voteban] " .. (reason or "")):Trim()
-		if ply:IsValid() then
+		if ply:IsValid() and confirm then
 			str = "Vote results: User will now be banned, pending approval. (" .. winnernum .. "/" .. t.votes .. ")"
 			ulx.doVote( "Accept result and ban " .. nick .. "?", { "Yes", "No" }, voteBanDone2, 30000, { ply }, true, nick, steamid, time, ply, reason )
 		else -- Vote from server console, roll with it
@@ -402,6 +407,7 @@ voteban:defaultAccess( ULib.ACCESS_ADMIN )
 voteban:help( "Starts a public ban vote against target." )
 if SERVER then ulx.convar( "votebanSuccessratio", "0.7", _, ULib.ACCESS_ADMIN ) end -- The ratio needed for a voteban to succeed
 if SERVER then ulx.convar( "votebanMinvotes", "3", _, ULib.ACCESS_ADMIN ) end -- Minimum votes needed for voteban
+if SERVER then ulx.convar( "votebanConfirmation", "1", _, ULib.ACCESS_ADMIN ) end
 
 -- Our regular votemap command
 local votemap = ulx.command( CATEGORY_NAME, "ulx votemap", ulx.votemap, "!votemap" )
