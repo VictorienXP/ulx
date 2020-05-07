@@ -115,7 +115,7 @@ local function voteDone( t )
 	if not winner then
 		str = "Vote results: No option won because no one voted!"
 	else
-		str = "Vote results: Option '" .. t.options[ winner ] .. "' won. (" .. winnernum .. "/" .. t.voters .. ")"
+		str = "Vote results: Option '" .. t.options[ winner ] .. "' won. (" .. winnernum .. "/" .. t.votes .. ")"
 	end
 	ULib.tsay( _, str ) -- TODO, color?
 	ulx.logString( str )
@@ -188,14 +188,14 @@ local function voteMapDone( t, argv, ply )
 		changeTo = argv[ 1 ]
 	end
 
-	if (#argv < 2 and winner ~= 1) or not winner or winnernum < minVotes or winnernum / t.voters < ratioNeeded then
+	if (#argv < 2 and winner ~= 1) or not winner or winnernum < minVotes or winnernum / t.votes < ratioNeeded then
 		str = "Vote results: Vote was unsuccessful."
 	elseif ply:IsValid() then
-		str = "Vote results: Option '" .. t.options[ winner ] .. "' won, changemap pending approval. (" .. winnernum .. "/" .. t.voters .. ")"
+		str = "Vote results: Option '" .. t.options[ winner ] .. "' won, changemap pending approval. (" .. winnernum .. "/" .. t.votes .. ")"
 
 		ulx.doVote( "Accept result and changemap to " .. changeTo .. "?", { "Yes", "No" }, voteMapDone2, 30000, { ply }, true, changeTo, ply )
 	else -- It's the server console, let's roll with it
-		str = "Vote results: Option '" .. t.options[ winner ] .. "' won. (" .. winnernum .. "/" .. t.voters .. ")"
+		str = "Vote results: Option '" .. t.options[ winner ] .. "' won. (" .. winnernum .. "/" .. t.votes .. ")"
 		ULib.tsay( _, str )
 		ulx.logString( str )
 		ULib.consoleCommand( "changelevel " .. changeTo .. "\n" )
@@ -272,16 +272,16 @@ local function voteKickDone( t, target, time, ply, reason )
 	local ratioNeeded = GetConVarNumber( "ulx_votekickSuccessratio" )
 	local minVotes = GetConVarNumber( "ulx_votekickMinvotes" )
 	local str
-	if winner ~= 1 or winnernum < minVotes or winnernum / t.voters < ratioNeeded then
-		str = "Vote results: User will not be kicked. (" .. (results[ 1 ] or "0") .. "/" .. t.voters .. ")"
+	if winner ~= 1 or winnernum < minVotes or winnernum / t.votes < ratioNeeded then
+		str = "Vote results: User will not be kicked. (" .. (results[ 1 ] or "0") .. "/" .. t.votes .. ")"
 	else
 		if not target:IsValid() then
 			str = "Vote results: User voted to be kicked, but has already left."
 		elseif ply:IsValid() then
-			str = "Vote results: User will now be kicked, pending approval. (" .. winnernum .. "/" .. t.voters .. ")"
+			str = "Vote results: User will now be kicked, pending approval. (" .. winnernum .. "/" .. t.votes .. ")"
 			ulx.doVote( "Accept result and kick " .. target:Nick() .. "?", { "Yes", "No" }, voteKickDone2, 30000, { ply }, true, target, time, ply, reason )
 		else -- Vote from server console, roll with it
-			str = "Vote results: User will now be kicked. (" .. winnernum .. "/" .. t.voters .. ")"
+			str = "Vote results: User will now be kicked. (" .. winnernum .. "/" .. t.votes .. ")"
 			ULib.kick( target, "Vote kick successful." )
 		end
 	end
@@ -353,15 +353,15 @@ local function voteBanDone( t, nick, steamid, time, ply, reason )
 	local ratioNeeded = GetConVarNumber( "ulx_votebanSuccessratio" )
 	local minVotes = GetConVarNumber( "ulx_votebanMinvotes" )
 	local str
-	if winner ~= 1 or winnernum < minVotes or winnernum / t.voters < ratioNeeded then
-		str = "Vote results: User will not be banned. (" .. (results[ 1 ] or "0") .. "/" .. t.voters .. ")"
+	if winner ~= 1 or winnernum < minVotes or winnernum / t.votes < ratioNeeded then
+		str = "Vote results: User will not be banned. (" .. (results[ 1 ] or "0") .. "/" .. t.votes .. ")"
 	else
 		reason = ("[ULX Voteban] " .. (reason or "")):Trim()
 		if ply:IsValid() then
-			str = "Vote results: User will now be banned, pending approval. (" .. winnernum .. "/" .. t.voters .. ")"
+			str = "Vote results: User will now be banned, pending approval. (" .. winnernum .. "/" .. t.votes .. ")"
 			ulx.doVote( "Accept result and ban " .. nick .. "?", { "Yes", "No" }, voteBanDone2, 30000, { ply }, true, nick, steamid, time, ply, reason )
 		else -- Vote from server console, roll with it
-			str = "Vote results: User will now be banned. (" .. winnernum .. "/" .. t.voters .. ")"
+			str = "Vote results: User will now be banned. (" .. winnernum .. "/" .. t.votes .. ")"
 			ULib.addBan( steamid, time, reason, nick, ply )
 		end
 	end
